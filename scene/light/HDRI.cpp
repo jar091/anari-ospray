@@ -55,4 +55,9 @@ bool HDRI::isValid() const
   return m_image;
 }
 
+bool HDRI::isVisibleEnvironment() const
+{
+  return visible && m_image && m_image->elementType() == ANARI_FLOAT32_VEC3;
+}
+
 } // namespace anari_ospray

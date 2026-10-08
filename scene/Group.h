@@ -29,6 +29,8 @@ struct Group : public Object
   void ospraySceneConstruct();
   void ospraySceneCommit();
 
+  bool hasVisibleEnvironment() const;
+
  private:
   void cleanup();
 

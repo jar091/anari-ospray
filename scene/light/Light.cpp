@@ -56,6 +56,11 @@ OSPLight Light::osprayLight() const
   return m_osprayLight;
 }
 
+bool Light::isVisibleEnvironment() const
+{
+  return false;
+}
+
 } // namespace anari_ospray
 
 OSPRAY_ANARI_TYPEFOR_DEFINITION(anari_ospray::Light *);

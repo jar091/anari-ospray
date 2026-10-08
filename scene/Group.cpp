@@ -160,6 +160,17 @@ void Group::ospraySceneConstruct()
   m_lights = std::move(lights);
 }
 
+bool Group::hasVisibleEnvironment() const
+{
+  if (!m_lightData)
+    return false;
+  return std::any_of(
+      m_lightData->handlesBegin(), m_lightData->handlesEnd(), [](Object *o) {
+        auto *l = (Light *)o;
+        return l && l->isValid() && l->isVisibleEnvironment();
+      });
+}
+
 void Group::ospraySceneCommit()
 {
   const auto &state = *deviceState();

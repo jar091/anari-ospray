@@ -28,7 +28,15 @@ struct Renderer : public Object
   bool denoiseAlpha() const;
   OSPDenoiserQuality denoiseQuality() const;
 
+  // A light seen by the camera (a visible hdri) takes the place of the
+  // background. OSPRay adds the background on top of such lights, so it is
+  // set to black then, keeping its alpha.
+  void setEnvironmentVisible(bool visible);
+
  private:
+  void applyBackground();
+
+  bool m_environmentVisible{false};
   float4 m_bgColor{float3(0.f), 1.f};
   float m_ambientRadiance{0.f};
   float3 m_ambientColor{1.f, 1.f, 1.f};

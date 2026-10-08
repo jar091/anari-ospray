@@ -28,6 +28,8 @@ struct World : public Object
 
   void setAmbientLightValues(float3 color, float intensity);
 
+  bool hasVisibleEnvironment() const;
+
  private:
   void rebuildBLSs();
   void recommitBLSs();

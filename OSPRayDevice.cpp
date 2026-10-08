@@ -439,8 +439,11 @@ OSPRayDevice::~OSPRayDevice()
   ospDeviceRelease(state.osprayDevice);
 }
 
+void preloadModule(const char *name);
+
 OSPDevice OSPRayDevice::createDevice() const
 {
+  preloadModule("cpu");
   ospLoadModule("cpu");
   return ospNewDevice("cpu");
 }

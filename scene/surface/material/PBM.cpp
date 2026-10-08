@@ -2,6 +2,11 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "PBM.h"
+// ospray
+#include <ospray/version.h>
+// std
+#include <algorithm>
+#include <cmath>
 
 namespace anari_ospray {
 
@@ -116,7 +121,21 @@ void PBM::finalize()
   setScalar("metallic", "map_metallic", m_metallic, m_metallicSampler.get());
   setScalar(
       "roughness", "map_roughness", m_roughness, m_roughnessSampler.get());
-  setScalar("specular", "map_specular", m_specular, m_specularSampler.get());
+  float specular = m_specular;
+#if OSPRAY_VERSION_MAJOR < 3 \
+    || (OSPRAY_VERSION_MAJOR == 3 && OSPRAY_VERSION_MINOR <= 2)
+  // OSPRay up to 3.2 has no 'specularMetallic': its 'specular' also weights
+  // the metallic and the transmissive lobe, while the ANARI parameter only
+  // scales the dielectric reflection. Keep those two lobes at full weight.
+  const bool mapped = (m_metallicSampler && m_metallicSampler->isValid())
+      || (m_transmissionSampler && m_transmissionSampler->isValid());
+  const float dielectric = mapped
+      ? 0.f
+      : (1.f - std::clamp(m_metallic, 0.f, 1.f))
+          * (1.f - std::clamp(m_transmission, 0.f, 1.f));
+  specular = 1.f - (1.f - m_specular) * dielectric;
+#endif
+  setScalar("specular", "map_specular", specular, m_specularSampler.get());
   bool specularMetallic = false;
   ospSetParam(om, "specularMetallic", OSP_BOOL, &specularMetallic);
   setScalar("coat", "map_coat", m_clearcoat, m_clearcoatSampler.get());
@@ -137,8 +156,16 @@ void PBM::finalize()
   ospSetParam(om, "thin", OSP_BOOL, &thin);
   setScalar("thickness", "map_thickness", m_thickness, nullptr);
 
-  ospSetParam(om, "transmissionDepth", OSP_FLOAT, &m_attenuationDistance);
-  ospSetParam(om, "transmissionColor", OSP_VEC3F, &m_attenuationColor);
+  // An infinite attenuation distance means no attenuation. OSPRay must not get
+  // the infinity itself: thin-walled glass (thickness 0) turns black with it.
+  float transmissionDepth = m_attenuationDistance;
+  float3 transmissionColor = m_attenuationColor;
+  if (!std::isfinite(transmissionDepth)) {
+    transmissionDepth = 1.f;
+    transmissionColor = float3(1.f);
+  }
+  ospSetParam(om, "transmissionDepth", OSP_FLOAT, &transmissionDepth);
+  ospSetParam(om, "transmissionColor", OSP_VEC3F, &transmissionColor);
 
   // OSPRay gates the sheen lobe on a scalar amount separate from its color
   bool hasSheen = sum(m_sheen) > 0.0f

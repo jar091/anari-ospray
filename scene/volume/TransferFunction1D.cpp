@@ -41,6 +41,11 @@ void TransferFunction1DVolume::commitParameters()
   if (!getParam("valueRange", ANARI_FLOAT32_BOX1, &m_valueRange))
     m_valueRange = float2(0.f, 1.f);
   m_densityScale = getParam<float>("densityScale", 1.f);
+  // 'unitDistance' is the distance over which the opacity applies: OSPRay
+  // uses densityScale * opacity as the extinction
+  const float unitDistance = getParam<float>("unitDistance", 1.f);
+  if (unitDistance > 0.f)
+    m_densityScale /= unitDistance;
 }
 
 void TransferFunction1DVolume::finalize()

@@ -14,6 +14,7 @@ struct HDRI : public Light
   void commitParameters() override;
   void finalize() override;
   bool isValid() const override;
+  bool isVisibleEnvironment() const override;
 
  private:
   helium::ChangeObserverPtr<Array2D> m_image;

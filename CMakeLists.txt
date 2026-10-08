@@ -46,6 +46,7 @@ project_sources(PRIVATE
   OSPRayDevice.cpp
   OSPRayGlobalState.cpp
   OSPRayLibrary.cpp
+  ModulePreload.cpp
   Object.cpp
   array/Array.cpp
   array/Array1D.cpp

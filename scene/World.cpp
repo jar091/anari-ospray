@@ -154,6 +154,13 @@ void World::setAmbientLightValues(float3 color, float intensity)
   ospCommit(oal);
 }
 
+bool World::hasVisibleEnvironment() const
+{
+  return std::any_of(m_instances.begin(), m_instances.end(), [](auto *inst) {
+    return inst && inst->isValid() && inst->group()->hasVisibleEnvironment();
+  });
+}
+
 void World::rebuildBLSs()
 {
   const auto &state = *deviceState();

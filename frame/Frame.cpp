@@ -220,6 +220,7 @@ void Frame::renderFrame()
   }
 
   m_world->osprayWorldUpdate();
+  m_renderer->setEnvironmentVisible(m_world->hasVisibleEnvironment());
 
   m_frameLastRendered = helium::newTimeStamp();
   state->currentFrame = this;

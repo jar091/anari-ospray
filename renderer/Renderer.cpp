@@ -36,10 +36,23 @@ void Renderer::commitParameters()
   m_denoiseQualityString = getParamString("denoiseQuality", "medium");
 }
 
-void Renderer::finalize()
+void Renderer::setEnvironmentVisible(bool visible)
+{
+  if (visible == m_environmentVisible)
+    return;
+  m_environmentVisible = visible;
+  applyBackground();
+  ospCommit(osprayRenderer());
+}
+
+void Renderer::applyBackground()
 {
   auto r = osprayRenderer();
-  if (m_bgImage) {
+  if (m_environmentVisible) {
+    const float4 black(float3(0.f), m_bgImage ? 1.f : m_bgColor.w);
+    ospSetParam(r, "backgroundColor", OSP_VEC4F, &black);
+    ospRemoveParam(r, "map_backplate");
+  } else if (m_bgImage) {
     if (!m_backplateTexture)
       m_backplateTexture = ospNewTexture("texture2d");
 
@@ -58,6 +71,12 @@ void Renderer::finalize()
     ospSetParam(r, "backgroundColor", OSP_VEC4F, &m_bgColor);
     ospRemoveParam(r, "map_backplate");
   }
+}
+
+void Renderer::finalize()
+{
+  auto r = osprayRenderer();
+  applyBackground();
   ospSetInt(r, "pixelSamples", m_pixelSamples);
   ospSetInt(r, "maxPathLength", m_maxPathLength);
   ospSetFloat(r, "minContribution", m_minContribution);

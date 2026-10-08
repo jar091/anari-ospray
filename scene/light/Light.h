@@ -19,6 +19,9 @@ struct Light : public Object
 
   OSPLight osprayLight() const;
 
+  // whether the camera sees this light in place of the renderer background
+  virtual bool isVisibleEnvironment() const;
+
  protected:
   bool visible{true};
   float3 color{1};
