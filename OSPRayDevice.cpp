@@ -478,6 +478,14 @@ void OSPRayDevice::initDevice()
 
   auto logLevel = OSP_LOG_INFO;
   ospDeviceSetParam(state.osprayDevice, "logLevel", OSP_UINT, &logLevel);
+  // OSPRay picks the coarsest MIP level for texture lookups on geometries
+  // whose texture coordinate is constant per primitive (spheres): every
+  // sphere then gets the average colour of the whole image instead of the
+  // texel its attribute addresses. ANARI samplers are not prefiltered, so
+  // textures are used without MIP maps.
+  const bool disableMipMaps = true;
+  ospDeviceSetParam(
+      state.osprayDevice, "disableMipMapGeneration", OSP_BOOL, &disableMipMaps);
   ospDeviceCommit(state.osprayDevice);
 
   m_initialized = true;
