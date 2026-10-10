@@ -99,6 +99,38 @@
      ]
     },
     {
+     "name": "maxBounce",
+     "tags": [],
+     "description": "maximum number of bounces after the camera hit (0: direct light only), counted as in Cycles; sets maxPathLength to the value + 1 and disables Russian roulette up to there",
+     "types": [
+      "ANARI_INT32"
+     ]
+    },
+    {
+     "name": "maxDiffuseBounce",
+     "tags": [],
+     "description": "maximum number of diffuse bounces of a path, counted as in Cycles; sets maxScatteringEvents to the value + 1, which also limits rough glossy bounces",
+     "types": [
+      "ANARI_INT32"
+     ]
+    },
+    {
+     "name": "clampDirect",
+     "tags": [],
+     "description": "clamp of direct light of Cycles; OSPRay only has maxContribution, the clamp of a whole pixel sample, which is set to clampDirect + clampIndirect",
+     "types": [
+      "ANARI_FLOAT32"
+     ]
+    },
+    {
+     "name": "clampIndirect",
+     "tags": [],
+     "description": "clamp of indirect light of Cycles, 0: no clamp; sets maxContribution (the clamp of a whole pixel sample, per channel) to clampDirect + clampIndirect",
+     "types": [
+      "ANARI_FLOAT32"
+     ]
+    },
+    {
      "name": "denoise",
      "tags": [],
      "default": false,

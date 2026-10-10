@@ -19,6 +19,12 @@ struct Pathtracer : public Renderer
   int m_maxScatteringEvents{20};
   float m_maxContribution{1e20f};
   bool m_backgroundRefraction{false};
+  // Path length limits and clamps with the names of Cycles; -1 and 0: not set
+  int m_maxBounce{-1};
+  int m_maxDiffuseBounce{-1};
+  float m_clampDirect{0.f};
+  float m_clampIndirect{0.f};
+  bool m_hasRoulettePathLength{false};
 };
 
 } // namespace anari_ospray

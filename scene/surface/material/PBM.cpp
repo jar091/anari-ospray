@@ -119,8 +119,22 @@ void PBM::finalize()
   setColor("baseColor", "map_baseColor", m_color, m_colorSampler.get());
   setScalar("opacity", "map_opacity", m_opacity, m_opacitySampler.get());
   setScalar("metallic", "map_metallic", m_metallic, m_metallicSampler.get());
-  setScalar(
-      "roughness", "map_roughness", m_roughness, m_roughnessSampler.get());
+  // OSPRay's 'roughness' is also the roughness of its diffuse lobe (Oren-Nayar,
+  // which reflects less to the side: 0.78 of a Lambertian surface at roughness
+  // 1, seen along the normal), while the diffuse lobe of this material is
+  // Lambertian. Without a specular or transmissive lobe the roughness has no
+  // other use: keep the diffuse lobe Lambertian then.
+  const bool diffuseOnly = m_metallic <= 0.f && m_specular <= 0.f
+      && m_transmission <= 0.f && m_clearcoat <= 0.f
+      && !(m_metallicSampler && m_metallicSampler->isValid())
+      && !(m_specularSampler && m_specularSampler->isValid())
+      && !(m_transmissionSampler && m_transmissionSampler->isValid())
+      && !(m_clearcoatSampler && m_clearcoatSampler->isValid());
+  if (diffuseOnly)
+    setScalar("roughness", "map_roughness", 0.f, nullptr);
+  else
+    setScalar(
+        "roughness", "map_roughness", m_roughness, m_roughnessSampler.get());
   float specular = m_specular;
 #if OSPRAY_VERSION_MAJOR < 3 \
     || (OSPRAY_VERSION_MAJOR == 3 && OSPRAY_VERSION_MINOR <= 2)
