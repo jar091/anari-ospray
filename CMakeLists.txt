@@ -18,7 +18,12 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 set(CMAKE_BUILD_TYPE_INIT Release)
 
-set(CMAKE_INSTALL_RPATH "$ORIGIN")
+if(APPLE)
+  # dyld does not know $ORIGIN: the OSPRay libraries are found next to the device.
+  set(CMAKE_INSTALL_RPATH "@loader_path")
+else()
+  set(CMAKE_INSTALL_RPATH "$ORIGIN")
+endif()
 set(CMAKE_INSTALL_MESSAGE LAZY)
 
 ## Establish project ##
